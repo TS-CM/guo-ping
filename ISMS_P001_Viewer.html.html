@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>ISMS 文件與紀錄管理程序 - ISMS-P-001 V1.0</title>
+    <link rel="stylesheet" href="styles.css?v=2.0"> 
+</head>
+<body>
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div class="container">
+        
+        <div class="header-container">
+            <h1>文件與紀錄管理程序 V1.0</h1>
+            <div>ISMS-P-001 / ISO 27001:2022 參考</div>
+        </div>
+
+        <div class="controls">
+             <div class="filter-container">
+                <label for="categoryFilter" class="filter-label">篩選主題：</label>
+                <select id="categoryFilter">
+                    <option value="all">全部主題</option>
+                    <option value="1">總則與定義</option>
+                    <option value="2">文件訂修廢作業</option>
+                    <option value="3">文件實施與管制</option>
+                    <option value="4">外來文件與法規</option>
+                    <option value="5">紀錄與保存</option>
+                    <option value="6">文件撰寫與編號</option> 
+                </select>
+            </div>
+
+            <div class="star-filter-container">
+                <label for="starFilter" class="star-filter-label">重要性：</label>
+                <select id="starFilter">
+                    <option value="all">全部重要性</option>
+                    <option value="5">★★★★★</option>
+                    <option value="4">★★★★</option>
+                    <option value="3">★★★</option>
+                    <option value="2">★★</option>
+                    <option value="1">★</option>
+                </select>
+            </div>
+
+            <div class="search-container">
+                <label for="searchInput" class="search-label">搜尋：</label>
+                <input type="text" id="searchInput" placeholder="輸入關鍵字...">
+                <button id="searchButton">搜尋</button>
+            </div>
+        </div>
+
+        <div class="categories-container">
+            <div class="categories-title">程序書章節分類</div>
+            
+            <div class="categories-grid" id="categoriesGrid">
+                <div class="category-item" data-category-id="1">
+                    <div class="category-number">1</div>
+                    <div class="category-text">總則與定義（目的、範圍、名詞）</div>
+                </div>
+                <div class="category-item" data-category-id="2">
+                    <div class="category-number">2</div>
+                    <div class="category-text">文件訂修廢（制訂、修訂、審核權限）</div>
+                </div>
+                 <div class="category-item" data-category-id="3">
+                    <div class="category-number">3</div>
+                    <div class="category-text">文件實施與管制（發行、機密等級、銷毀）</div>
+                </div>
+                <div class="category-item" data-category-id="4">
+                    <div class="category-number">4</div>
+                    <div class="category-text">外來文件與法規（管制、法令識別）</div>
+                </div>
+                <div class="category-item" data-category-id="5">
+                    <div class="category-number">5</div>
+                    <div class="category-text">紀錄與保存（保存期限、維護管理）</div>
+                </div>
+                 <div class="category-item" data-category-id="6">
+                    <div class="category-number">6</div>
+                    <div class="category-text">文件撰寫與編號原則</div>
+                </div>
+            </div> </div> <div class="focus-points-container" id="focusPointsContainer">
+            </div>
+        
+        <div id="noResultsMessage">沒有找到符合條件的重點。</div>
+
+        <div class="back-to-top" id="backToTop">↑</div>
+        
+    </div> <script src="data.js?v=2.0"></script>
+    <script src="script.js?v=2.0"></script>
+</body>
+</html>
