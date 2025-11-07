@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>ISMS 文件與紀錄管理程序 - ISMS-P-001 V1.0</title>
+    <style>
+        /* CSS 樣式從上個檔案複製過來，確保外觀一致 */
+        * { box-sizing: border-box; }
+        body { margin: 0; padding: 0; font-family: "Microsoft JhengHei", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: #f4f7f6; color: #333; line-height: 1.6; }
+        .container { max-width: 1200px; margin: 20px auto; padding: 25px; background: #ffffff; box-shadow: 0 2px 15px rgba(0,0,0,0.08); border-radius: 8px; }
+        .header-container { background: linear-gradient(135deg, #2c3e50, #34495e); color: white; padding: 30px 20px; margin: -25px -25px 25px -25px; border-radius: 8px 8px 0 0; text-align: center; }
+        .header-container h1 { margin: 0; color: white; font-size: 2.2rem; font-weight: 600; margin-bottom: 5px; }
+        .header-container div { font-size: 1.2rem; opacity: 0.9; margin-top: 5px; font-weight: 300; }
+        .categories-container { background-color: #e8f0f5; padding: 20px; margin-bottom: 25px; border-left: 5px solid #5dade2; border-radius: 5px; }
+        .categories-title { font-size: 1.3rem; font-weight: bold; margin-bottom: 15px; color: #2c3e50; }
+        .categories-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; }
+        .category-item { display: flex; align-items: center; padding: 12px 15px; background-color: white; border-radius: 5px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #d6e0ea; }
+        .category-item:hover { background-color: #5dade2; color: white; transform: translateY(-3px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-color: #5dade2; }
+        .category-number { width: 30px; height: 30px; background-color: #5dade2; color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin-right: 12px; font-weight: bold; flex-shrink: 0; transition: all 0.3s ease; }
+        .category-item:hover .category-number { background-color: white; color: #5dade2; }
+        .category-text { font-size: 0.95rem; }
+        .focus-points-container { display: grid; grid-template-columns: 1fr; gap: 30px; }
+        .focus-card { background-color: #ffffff; border-radius: 8px; padding: 0; box-shadow: 0 4px 12px rgba(44, 62, 80, 0.1); transition: transform 0.2s ease-out, box-shadow 0.2s ease-out; border: 1px solid #e0e0e0; overflow: hidden; }
+        .focus-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(44, 62, 80, 0.15); }
+        .focus-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; background-color: #f8f9fa; border-bottom: 1px solid #e0e0e0; }
+        .focus-id { font-weight: bold; color: #5dade2; font-size: 1rem; background-color: #e8f0f5; padding: 3px 8px; border-radius: 4px; }
+        .focus-importance { color: #e74c3c; font-weight: bold; font-size: 1rem; }
+        .focus-topic-container { padding: 25px 25px 20px 25px; border-bottom: 1px dashed #eee; }
+        .focus-topic { font-size: 1.5rem; font-weight: 600; margin-bottom: 0; line-height: 1.4; color: #2c3e50; }
+        .focus-details-container { padding: 20px 25px 25px 25px; }
+        .details-header { font-weight: bold; margin-bottom: 15px; color: #34495e; font-size: 1.2rem; letter-spacing: 0.5px; }
+        .details-content { line-height: 1.75; color: #444; font-size: 1.05rem; }
+        .details-content ul { padding-left: 25px; margin-top: 10px; margin-bottom: 10px; }
+        .details-content li { margin-bottom: 8px; }
+        .details-content p { margin-top: 5px; margin-bottom: 5px; }
+        .details-content strong { color: #2c3e50; }
+        .details-content table.authority-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .details-content table.authority-table th, .details-content table.authority-table td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        .details-content table.authority-table th { background-color: #f2f2f2; color: #333; font-weight: 600; }
+        
+        .controls { display: flex; justify-content: space-between; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; padding: 15px; background-color: #fdfdfd; border-radius: 5px; border: 1px solid #eee; }
+        .filter-container, .search-container, .star-filter-container { margin-bottom: 0; display: flex; align-items: center; flex-grow: 1; min-width: 200px; }
+        .search-container { flex-grow: 2; }
+        .filter-label, .search-label, .star-filter-label { font-weight: 600; margin-right: 10px; white-space: nowrap; color: #555; font-size: 0.95rem; }
+        select, input[type="text"] { padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-family: inherit; flex-grow: 1; font-size: 0.95rem; background-color: white; }
+        input[type="text"] { min-width: 180px; }
+        button { padding: 10px 18px; background-color: #5dade2; color: white; border: none; border-radius: 5px; cursor: pointer; font-family: inherit; transition: background-color 0.2s ease; font-size: 0.95rem; font-weight: 500; margin-left: 8px; white-space: nowrap; }
+        button:hover { background-color: #3498db; }
+        @media (max-width: 992px) { .controls { flex-direction: column; align-items: stretch; } .filter-container, .search-container, .star-filter-container { width: 100%; flex-grow: 0; } select, input[type="text"] { width: 100%; } button { margin-left: 0; margin-top: 5px; } .search-container button { margin-left: 8px; margin-top: 0; } #searchInput { width: calc(100% - 90px); } }
+        @media (max-width: 768px) { .container { padding: 15px; } .header-container { padding: 25px 15px; margin: -15px -15px 20px -15px; } .categories-grid { grid-template-columns: 1fr; } .focus-card { padding: 0; } .focus-header, .focus-topic-container, .focus-details-container { padding-left: 20px; padding-right: 20px; } h1 { font-size: 1.8rem; } .header-container h1 { font-size: 2rem; } .focus-topic { font-size: 1.3rem; } .details-header { font-size: 1.1rem; } .details-content { font-size: 1rem; } }
+        .back-to-top { position: fixed; bottom: 25px; right: 25px; background-color: #5dade2; color: white; width: 45px; height: 45px; border-radius: 50%; display: none; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.2); transition: background-color 0.3s, opacity 0.3s, transform 0.3s; z-index: 1000; opacity: 0.8; font-size: 1.2rem; }
+        .back-to-top:hover { background-color: #3498db; opacity: 1; transform: scale(1.1); }
+        .progress-container { width: 100%; height: 5px; background-color: #e8f0f5; position: fixed; top: 0; left: 0; z-index: 1001; }
+        .progress-bar { height: 5px; background: linear-gradient(90deg, #5dade2, #85c1e9); width: 0%; border-radius: 0 2px 2px 0; transition: width 0.1s linear; }
+        #noResultsMessage { text-align: center; padding: 20px; color: #777; display: none; font-style: italic; }
+    </style>
+</head>
+<body>
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div class="container">
+        <div class="header-container">
+            <h1>文件與紀錄管理程序 V1.0</h1>
+            <div>ISMS-P-001 / ISO 27001:2022 參考</div>
+        </div>
+
+        <div class="controls">
+             <div class="filter-container">
+                <label for="categoryFilter" class="filter-label">篩選主題：</label>
+                <select id="categoryFilter">
+                    <option value="all">全部主題</option>
+                    <option value="1">總則與定義</option>
+                    <option value="2">文件訂修廢作業</option>
+                    <option value="3">文件實施與管制</option>
+                    <option value="4">外來文件與法規</option>
+                    <option value="5">紀錄與保存</option>
+                </select>
+            </div>
+
+            <div class="star-filter-container">
+                <label for="starFilter" class="star-filter-label">重要性：</label>
+                <select id="starFilter">
+                    <option value="all">全部重要性</option>
+                    <option value="5">★★★★★</option>
+                    <option value="4">★★★★</option>
+                    <option value="3">★★★</option>
+                    <option value="2">★★</option>
+                    <option value="1">★</option>
+                </select>
+            </div>
+
+            <div class="search-container">
+                <label for="searchInput" class="search-label">搜尋：</label>
+                <input type="text" id="searchInput" placeholder="輸入關鍵字...">
+                <button id="searchButton">搜尋</button>
+            </div>
+        </div>
+
+        <div class="categories-container">
+            <div class="categories-title">程序書章節分類</div>
+            <div class="categories-grid" id="categoriesGrid">
+                <div class="category-item" data-category-id="1">
+                    <div class="category-number">1</div>
+                    <div class="category-text">總則與定義（目的、範圍、名詞）</div>
+                </div>
+                <div class="category-item" data-category-id="2">
+                    <div class="category-number">2</div>
+                    <div class="category-text">文件訂修廢（制訂、修訂、審核權限）</div>
+                </div>
+                 <div class="category-item" data-category-id="3">
+                    <div class="category-number">3</div>
+                    <div class="category-text">文件實施與管制（發行、機密等級、銷毀）</div>
+                </div>
+                <div class="category-item" data-category-id="4">
+                    <div class="category-number">4</div>
+                    <div class="category-text">外來文件與法規（管制、法令識別）</div>
+                </div>
+                <div class="category-item" data-category-id="5">
+                    <div class="category-number">5</div>
+                    <div class="category-text">紀錄與保存（保存期限、維護管理）</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="focus-points-container" id="focusPointsContainer">
+            </div><div id="noResultsMessage">沒有找到符合條件的重點。</div>
+
+        <div class="back-to-top" id="backToTop">↑</div>
+    </div>
+
+    <script>
+        // --- ISMS 文件結構化數據 (內容未變動) ---
+        const ismsDocumentData = [
+            // 總則與定義 (Category 1)
+            {
+                id: 1,
+                category: 1,
+                stars: 4,
+                topic: "目的與適用範圍",
+                header: "確保文件適用性、有效性及最新版文件",
+                details: `
+                    <div class="details-header">目的</div>
+                    <div class="details-content">
+                        為使本公司執行管理制度所用之文件，於制訂、修訂、廢止過程中有一明確的規範，且能確切管理各項外來標準及法令法規等資料，以期所使用的文件與紀錄能隨時保持其適用性與有效性，確保能適時獲得有效之最新版文件。
+                    </div>
+                    <div class="details-header">適用範圍</div>
+                    <div class="details-content">
+                        本公司所訂定且經核准頒布的各項標準作業文件，以及外來標準及法令等資料之管理。
+                    </div>
+                `
+            },
+            {
+                id: 2,
+                category: 1,
+                stars: 5,
+                topic: "核心文件類型定義",
+                header: "區分政策、程序書、標準書與紀錄",
+                details: `
+                    <div class="details-header">名詞定義</div>
+                    <div class="details-content">
+                        <ul>
+                            <li><strong>管制文件：</strong>需受到管制的文件（政策、程序書、標準書、表單、外部標準及法令等）。</li>
+                            <li><strong>政策 (Manual, 一階文件)：</strong>對主管機關及全體同仁所做的整體性概要說明。</li>
+                            <li><strong>程序書 (Procedure, 二階文件)：</strong>規範各項管理作業的流程、權責及相關內容。</li>
+                            <li><strong>標準書 (Work Instruction, 三階文件)：</strong>詳述各項工作的細節及標準工作方法。</li>
+                            <li><strong>表單 (Form, 四階文件)：</strong>用來填寫各項紀錄之標準格式。</li>
+                            <li><strong>紀錄 (Records)：</strong>表單依實際需要書寫數據、符號或文字後，即成為紀錄。</li>
+                            <li><strong>外來文件：</strong>非由本公司自行制訂，但有必要列管的文件（如廠商手冊、法令法規）。</li>
+                        </ul>
+                    </div>
+                `
+            },
+            // 文件訂修廢作業 (Category 2)
+            {
+                id: 3,
+                category: 2,
+                stars: 4,
+                topic: "文件訂修廢作業",
+                header: "制訂、修訂與廢止的標準流程",
+                details: `
+                    <div class="details-header">作業流程與表單</div>
+                    <div class="details-content">
+                        <ul>
+                            <li><strong>承辦人：</strong>負責先行草擬文件內容，填寫「ISMS-P-001-01文件訂修廢建議表」併同文件送審。</li>
+                            <li><strong>修訂：</strong>若不合現狀，由業務承辦人員研擬修改內容，註明修訂原因於建議表和「訂修廢記錄頁」中送審。</li>
+                            <li><strong>廢止：</strong>若已不適用，由原制訂單位承辦人員將廢止理由及原因簡述於建議表後送審。</li>
+                        </ul>
+                    </div>
+                    <div class="details-header">審核/核准權限</div>
+                    <div class="details-content">
+                        <table class="authority-table">
+                            <thead>
+                                <tr><th>權責類別</th><th>審查</th><th>核准</th><th>發行</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>政策 (一階)</td><td>資訊安全代表</td><td>資訊安全長</td><td>文件管理小組</td></tr>
+                                <tr><td>程序書 (二階)</td><td>資訊安全代表</td><td>資訊安全長</td><td>文件管理小組</td></tr>
+                                <tr><td>標準書 (三階)</td><td>資訊安全代表</td><td>資訊安全長</td><td>文件管理小組</td></tr>
+                                <tr><td>表單 (四階)</td><td>相關單位主管</td><td>資訊安全代表</td><td>文件管理小組</td></tr>
+                            </tbody>
+                        </table>
+                        <p>審查、核准者若有修正意見，得協調制訂單位修改，必要時得要求召開會議審議。</p>
+                    </div>
+                `
+            },
+            // 文件實施與管制 (Category 3)
+            {
+                id: 4,
+                category: 3,
+                stars: 5,
+                topic: "文件發行與版本管制",
+                header: "確保使用最新且不可修改的版本",
+                details: `
+                    <div class="details-header">發行與取得</div>
+                    <div class="details-content">
+                        文件經核准後，文件管理小組應：
+                        <ul>
+                            <li>將文件轉成<strong>唯讀格式</strong>（表單除外），如 PDF 格式。</li>
+                            <li>標註「<strong>管制文件</strong>」字樣。</li>
+                            <li>上傳至本公司內網之公告-ISO平台，並適當公告週知。</li>
+                            <li><strong>舊版銷毀：</strong>新版發行時，使用人員應將已印出之舊版紙本文件銷毀，再重新下載及列印新版文件。</li>
+                        </ul>
+                    </div>
+                    <div class="details-header">實施與鑑別</div>
+                    <div class="details-content">
+                         <ul>
+                            <li><strong>實施原則：</strong>各單位人員執行業務時，應確實遵守管制文件之規定。若與規定不符，應依規定修改文件。</li>
+                            <li><strong>文件要素：</strong>文件包含文件編號及文件主體。</li>
+                            <li><strong>頁首/頁尾：</strong>須註明文件編號、文件名稱、機密等級、發行版次等資訊。</li>
+                            <li><strong>禁止塗改：</strong>管制文件不得擅自塗改或做記號。</li>
+                        </ul>
+                    </div>
+                `
+            },
+            {
+                id: 5,
+                category: 3,
+                stars: 4,
+                topic: "機敏性文件安全管制",
+                header: "防範機敏性資訊洩漏與不當使用",
+                details: `
+                    <div class="details-header">機密等級與控管</div>
+                    <div class="details-content">
+                         <ul>
+                            <li>機密等級須依據「ISMS-P-003資訊資產管理程序」規定辦理。</li>
+                            <li>除公務用途外，<strong>不可任意列印流通</strong>。</li>
+                            <li>依使用者職權賦予適當之<strong>文件存取權限</strong>。</li>
+                        </ul>
+                    </div>
+                    <div class="details-header">調閱與銷毀</div>
+                    <div class="details-content">
+                         <ul>
+                            <li><strong>調閱：</strong>調閱者須依公司申請流程提出申請，經單位主管核准後，向業務承辦人員辦理，業務承辦人員須留下調閱紀錄。</li>
+                            <li><strong>列印/影印：</strong>機密等級屬「機敏」的文件，若使用傳真、影印或印表機列印，其過程應<strong>全程監看</strong>並使用<strong>監管軟件控管</strong>，結束後應立即取走文件。</li>
+                            <li><strong>銷毀：</strong>機敏性文件應以<strong>碎紙機銷毀或焚毀</strong>。銷毀前應取得「文件管理小組」同意，並記錄於「ISMS-P-001-03機敏文件銷毀紀錄表」。</li>
+                            <li><strong>離職：</strong>人員離職時，應主動繳回持有與借閱之文件。</li>
+                        </ul>
+                    </div>
+                `
+            },
+            // 外來文件與法規 (Category 4)
+            {
+                id: 6,
+                category: 4,
+                stars: 5,
+                topic: "外來文件與法規管制",
+                header: "外來文件納入管制，法規需定期檢查",
+                details: `
+                    <div class="details-header">外來文件管制</div>
+                    <div class="details-content">
+                        <ul>
+                            <li><strong>權責單位：</strong>取得外來文件後，應檢查其<strong>適切性、完整性、可用性及機密性</strong>。</li>
+                            <li><strong>文件管理小組：</strong>負責登錄於「ISMS-P-001-04外來文件管制表」，以防止版本之誤用。</li>
+                            <li><strong>資產管理：</strong>外來文件列為資訊資產，須依「ISMS-P-003資訊資產管理程序書」進行管理。</li>
+                        </ul>
+                    </div>
+                    <div class="details-header">法令法規識別</div>
+                    <div class="details-content">
+                        <ul>
+                            <li><strong>辨識：</strong>文件管理小組應隨時辨識與本公司業務相關之法令法規（如：<strong>個人資料保護法、著作權法、資通安全管理法</strong>）。</li>
+                            <li><strong>列管：</strong>登錄於「ISMS-P-001-04外來文件管制表」。</li>
+                            <li><strong>宣導：</strong>透過電子郵件、公告或教育訓練等方式向內部人員及重要委外廠商宣導。</li>
+                            <li><strong>檢查：</strong>「文件管理小組」應<strong>每年定期檢查</strong>法令法規之變更情況，並同步更新管制表。</li>
+                        </ul>
+                    </div>
+                `
+            },
+            // 紀錄與保存 (Category 5)
+            {
+                id: 7,
+                category: 5,
+                stars: 5,
+                topic: "資訊安全紀錄保存期限",
+                header: "紀錄保存期限應大於業務需要使用年限",
+                details: `
+                    <div class="details-header">保存原則</div>
+                    <div class="details-content">
+                        <ul>
+                            <li>紀錄應登錄於「ISMS-P-001-02管制文件一覽表」中。</li>
+                            <li>應依法律、單位需求與紀錄性質要求訂定<strong>最低保存期限</strong>，並妥善保存與列管。</li>
+                            <li>保存期限應<strong>大於業務需要使用年限</strong>，避免紀錄銷毀後無參考依據可進行資訊系統之評判與矯正。</li>
+                        </ul>
+                    </div>
+                    <div class="details-header">表單紀錄保存範例</div>
+                    <div class="details-content">
+                        <ul>
+                            <li>文件訂修廢建議表：保存地點為文管中心，期限<strong>至少3年</strong>。</li>
+                            <li>管制文件一覽表：保存地點為文管中心，期限<strong>至少3年</strong>。</li>
+                            <li>機敏文件銷毀紀錄表：保存地點為文管中心，期限<strong>至少3年</strong>。</li>
+                            <li>外來文件管制表：保存地點為文管中心，期限<strong>至少3年</strong>。</li>
+                        </ul>
+                    </div>
+                `
+            },
+             {
+                id: 8,
+                category: 5,
+                stars: 4,
+                topic: "紀錄識別與維護管理",
+                header: "確保紀錄的可信度與可用性",
+                details: `
+                    <div class="details-header">紀錄填寫與審核</div>
+                    <div class="details-content">
+                        <ul>
+                            <li>必須建立資訊安全管理制度執行之紀錄，以提供有效運作之證據。</li>
+                            <li>承辦人員需確實填寫，並由權責主管進行審核。</li>
+                            <li>填寫力求<strong>簡單、確實</strong>。審核及批准人員應查對其記載資料之<strong>可信度</strong>。</li>
+                        </ul>
+                    </div>
+                    <div class="details-header">儲存與維護</div>
+                    <div class="details-content">
+                         <ul>
+                            <li><strong>識別：</strong>應以表單編號識別，以便於識別與追溯。</li>
+                            <li><strong>場所：</strong>應存放於適當場所，慎防浸水、發霉等毀損情形。</li>
+                            <li><strong>維護：</strong>須由專人或業務承辦人妥善保存，以確保其<strong>機密性、完整性與可用性</strong>。</li>
+                            <li><strong>銷毀：</strong>於保存期限到期時，方可予以作廢與銷毀。</li>
+                            <li><strong>備份：</strong>若儲存於電子媒體，應依「ISMS-P-015資訊備份管理程序」<strong>定期進行備份</strong>。</li>
+                        </ul>
+                    </div>
+                `
+            }
+        ];
+
+
+        // --- JavaScript 核心邏輯 (渲染、篩選、搜尋) ---
+
+        // 函式：將單一資料物件轉換為 HTML 卡片
+        function createFocusCard(data) {
+            const importance = '★'.repeat(data.stars);
+            return `
+                <div class="focus-card" data-category="${data.category}" data-stars="${data.stars}">
+                    <div class="focus-header">
+                        <div class="focus-id">#${data.id}</div>
+                        <div class="focus-importance">${importance}</div>
+                    </div>
+                    <div class="focus-topic-container">
+                        <div class="focus-topic">
+                            ${data.topic}
+                        </div>
+                    </div>
+                    <div class="focus-details-container">
+                        <div class="details-header">${data.header}</div>
+                        <div class="details-content">
+                            ${data.details}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 函式：動態生成所有卡片並渲染到網頁
+        function renderAllFocusPoints() {
+            const container = document.getElementById('focusPointsContainer');
+            if (container) {
+                container.innerHTML = '';
+                ismsDocumentData.forEach(item => {
+                    container.innerHTML += createFocusCard(item);
+                });
+            }
+        }
+
+        // 修正 2A: 新增函式：設定分類按鈕的點擊事件
+        function setupCategoryButtons() {
+            // 獲取所有具有 data-category-id 屬性的 category-item 元素
+            const categoryItems = document.querySelectorAll('.category-item');
+            
+            categoryItems.forEach(item => {
+                // 取得 data-category-id 屬性值
+                const categoryId = item.dataset.categoryId;
+                
+                // 為每個按鈕添加點擊監聽器
+                if (categoryId) {
+                    item.addEventListener('click', function() {
+                        // 當點擊時，呼叫 filterByCategory 函式
+                        // 使用 parseInt 確保傳入的是數字
+                        filterByCategory(parseInt(categoryId));
+                    });
+                }
+            });
+        }
+
+
+        // Progress bar and Back to Top (保留)
+        const progressBar = document.getElementById("progressBar");
+        window.onscroll = function() { updateProgressBar(); toggleBackToTopButton(); };
+        function updateProgressBar() {
+            let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            let scrolled = (height > 0) ? (winScroll / height) * 100 : 0;
+            progressBar.style.width = scrolled + "%";
+        }
+        const backToTopButton = document.getElementById("backToTop");
+        function toggleBackToTopButton() {
+             backToTopButton.style.display = (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) ? "flex" : "none";
+        }
+        backToTopButton.addEventListener("click", () => window.scrollTo({top: 0, behavior: 'smooth'}));
+
+
+        // Filter by category (更新了清除搜尋框的邏輯)
+        function filterByCategory(categoryNumber) {
+            // 確保選單的值被設定為正確的字串格式
+            document.getElementById('categoryFilter').value = categoryNumber === 'all' ? 'all' : String(categoryNumber); 
+            document.getElementById('searchInput').value = '';
+            filterFocusPoints();
+        }
+
+        // Event listeners for filters and search (保留)
+        document.getElementById("categoryFilter").addEventListener("change", () => {
+             document.getElementById('searchInput').value = '';
+             filterFocusPoints();
+        });
+        document.getElementById("starFilter").addEventListener("change", () => {
+             document.getElementById('searchInput').value = '';
+             filterFocusPoints();
+        });
+        document.getElementById("searchButton").addEventListener("click", searchFocusPoints);
+        document.getElementById("searchInput").addEventListener("keyup", function(event) {
+            if (event.key === "Enter") {
+                searchFocusPoints();
+            }
+        });
+
+        const noResultsMessage = document.getElementById('noResultsMessage');
+
+        // Combined filter function (保留)
+        function filterFocusPoints() {
+            let category = document.getElementById("categoryFilter").value;
+            let stars = document.getElementById("starFilter").value;
+            let points = document.querySelectorAll(".focus-card");
+            let anyVisible = false;
+
+            points.forEach(function(point) {
+                const matchesCategory = (category === "all" || point.dataset.category === category);
+                const matchesStars = (stars === "all" || point.dataset.stars === stars);
+
+                if (matchesCategory && matchesStars) {
+                    point.style.display = "block";
+                    anyVisible = true;
+                } else {
+                    point.style.display = "none";
+                }
+            });
+
+             if (noResultsMessage) {
+                 noResultsMessage.style.display = anyVisible ? 'none' : 'block';
+                 noResultsMessage.textContent = '沒有找到符合篩選條件的重點。';
+             }
+        }
+
+        // Search function (保留)
+        function searchFocusPoints() {
+            let searchText = document.getElementById("searchInput").value.toLowerCase().trim();
+            let points = document.querySelectorAll(".focus-card");
+            let anyVisible = false;
+            let category = document.getElementById("categoryFilter").value;
+            let stars = document.getElementById("starFilter").value;
+
+            points.forEach(function(point) {
+                const matchesCategory = (category === "all" || point.dataset.category === category);
+                const matchesStars = (stars === "all" || point.dataset.stars === stars);
+                let visibleBasedOnFilter = matchesCategory && matchesStars;
+
+                let pointText = point.textContent.toLowerCase();
+                let matchesSearch = (searchText === "" || pointText.includes(searchText));
+
+                if (visibleBasedOnFilter && matchesSearch) {
+                    point.style.display = "block";
+                    anyVisible = true;
+                } else {
+                    point.style.display = "none";
+                }
+            });
+
+             if (noResultsMessage) {
+                 if (searchText !== "") {
+                      noResultsMessage.style.display = anyVisible ? 'none' : 'block';
+                      noResultsMessage.textContent = '沒有找到符合目前篩選及搜尋條件的重點。';
+                 } else {
+                     filterFocusPoints();
+                 }
+             }
+        }
+
+         // 修正 2B: 修改 initialSetup 函式，確保在渲染後立即綁定事件
+         function initialSetup() {
+             renderAllFocusPoints(); 
+             setupCategoryButtons(); // <--- 關鍵：綁定分類按鈕的點擊事件
+             toggleBackToTopButton();
+             updateProgressBar();
+             filterFocusPoints();
+         }
+
+         window.onload = initialSetup;
+
+    </script>
+</body>
+</html>
